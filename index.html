@@ -799,7 +799,7 @@
     <div id="quiz-timer-strip" class="quiz-timer-strip">
       <div class="timer-strip-header">
         <span class="timer-q-counter" id="timer-counter">Question 1 of 12</span>
-        <span class="timer-text" id="timer-display">⏱ Time Remaining: <strong id="time-left-val">05:00</strong></span>
+        <span class="timer-text" id="timer-display">⏱ Time Remaining: <strong id="time-left-val">08:00</strong></span>
       </div>
       <div class="timer-bar-track">
         <div class="timer-bar-fill" id="timer-bar-fill" style="width: 100%;"></div>
@@ -1019,8 +1019,8 @@
     let current = 0;
     let answers = {}; // { IMG_01: "A", ... }
     
-    // Dedicated calibrated timer: 5 minutes (300 seconds) for 12 visual questions (~25s per item)
-    const TOTAL_TIME_SECONDS = 300;
+    // Dedicated calibrated timer: 8 minutes (480 seconds) for 12 visual questions (~40s per item)
+    const TOTAL_TIME_SECONDS = 480;
     let timeLeft = TOTAL_TIME_SECONDS;
     let timerInterval = null;
 
@@ -1053,7 +1053,7 @@
       const pct = (timeLeft / TOTAL_TIME_SECONDS) * 100;
       if (fillEl) fillEl.style.width = `${pct}%`;
 
-      const isUrgent = timeLeft <= 45;
+      const isUrgent = timeLeft <= 60;
       if (timerDisplayEl) timerDisplayEl.classList.toggle('timer-urgent', isUrgent);
       if (fillEl) fillEl.classList.toggle('fill-urgent', isUrgent);
     }
