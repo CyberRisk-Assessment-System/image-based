@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import sqlite3, os, uuid
-from datetime import datetime
+import sqlite3, os, uuid, sys
+
+log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "error.log")
+sys.stdout = open(log_file, "a", buffering=1)
+sys.stderr = open(log_file, "a", buffering=1)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH  = os.path.join(BASE_DIR, "submissions.db")
@@ -63,6 +66,9 @@ def submit():
     return jsonify({"status": "ok", "saved": len(answers), "session_id": session_id}), 201
 
 if __name__ == "__main__":
-    print("\nCyberRisk Image-Based Questionnaire")
-    print("   Running at: http://127.0.0.1:5000\n")
+    try:
+        print("\nCyberRisk Image-Based Questionnaire")
+        print("   Running at: http://127.0.0.1:5000\n")
+    except Exception:
+        pass
     app.run(host="0.0.0.0", port=5000, debug=False)

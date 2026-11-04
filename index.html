@@ -853,27 +853,30 @@
       </div>
     </main>
 
-    <!-- Assessment Result Screen -->
+    <!-- Assessment Completion / Thank You Screen -->
     <section id="screen-summary" class="report-card" hidden>
-      <div class="report-badge">Assessment Result • Module 2</div>
-      <h2 class="report-title">Visual Choice Disposition Profile</h2>
-      <p class="report-subtitle">Psychometric analysis based on forced-choice scenario behaviour</p>
+      <div class="report-badge">Module 2 Complete • Visual Questionnaire</div>
+      <div style="font-size: 3.2rem; margin: 16px 0 8px;">✅</div>
+      <h2 class="report-title">Thank You for Participating!</h2>
+      <p class="report-subtitle">Your visual scenario responses have been successfully recorded.</p>
 
-      <div id="gauge-container" class="gauge-wrap"></div>
-      <div id="risk-pill" class="risk-pill"></div>
-      <p class="profile-summary-text" id="profile-text"></p>
-
-      <div class="factor-pills" id="factor-pills"></div>
-
-      <hr class="report-divider" />
-
-      <div class="breakdown-header">Scenario Decisions Breakdown</div>
-      <div class="q-breakdown-list" id="q-breakdown"></div>
-
-      <hr class="report-divider" />
+      <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; max-width: 580px; width: 100%; margin: 12px 0 28px; text-align: left; box-shadow: var(--sh0);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.92rem;">
+          <span style="color: var(--muted); font-weight: 500;">Status</span>
+          <span style="color: var(--safe); font-weight: 700; background: var(--safe-light); border: 1px solid var(--safe); padding: 3px 12px; border-radius: 99px;">✓ Recorded in Database</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 0.92rem;">
+          <span style="color: var(--muted); font-weight: 500;">Questions Completed</span>
+          <span style="color: var(--text); font-weight: 700; font-family: var(--mono);">12 of 12</span>
+        </div>
+        <hr style="border: none; border-top: 1px solid var(--border); margin: 12px 0;" />
+        <p style="font-size: 0.9rem; color: var(--text2); line-height: 1.55; margin: 0;">
+          Your responses will be integrated and scored as part of the complete Cyber Risk Assessment profile across all modules. You can now proceed to the next module.
+        </p>
+      </div>
 
       <div class="pipeline-actions">
-        <button class="btn-pipeline btn-pipeline-secondary" onclick="restart()">↺ Retake Module</button>
+        <button class="btn-pipeline btn-pipeline-secondary" onclick="restart()">↺ Retake Questionnaire</button>
         <button class="btn-pipeline btn-pipeline-primary" onclick="proceedToGamification()">Proceed to Gamification Module →</button>
       </div>
     </section>
@@ -1204,80 +1207,11 @@
       displayResults();
     }
 
-    function computeScore() {
-      let riskCount = 0;
-      QUESTIONS.forEach(q => {
-        const sel = answers[q.id];
-        if (sel && q.options[sel].riskType === 'risk') riskCount++;
-      });
-      const ratio = riskCount / QUESTIONS.length;
-      if (ratio <= 0.3) return { score: Math.round(20 + ratio * 50), level: 'low', riskCount };
-      if (ratio <= 0.6) return { score: Math.round(45 + (ratio - 0.3) * 60), level: 'moderate', riskCount };
-      return { score: Math.min(95, Math.round(65 + (ratio - 0.6) * 75)), level: 'high', riskCount };
-    }
-
     function displayResults() {
       document.getElementById('screen-quiz').hidden = true;
       document.getElementById('quiz-timer-strip').hidden = true;
       document.getElementById('topbar-back-btn').hidden = true;
       document.getElementById('screen-summary').hidden = false;
-
-      const { score, level, riskCount } = computeScore();
-      const protCount = QUESTIONS.length - riskCount;
-      const clr = level === 'low' ? '#246848' : level === 'moderate' ? '#8c5a10' : '#b83030';
-
-      // SVG Arc Score Gauge (Matching Forced-Choice Gauge Design)
-      const gcont = document.getElementById('gauge-container');
-      const angle = (score / 100) * 180;
-      const rad = angle * Math.PI / 180;
-      const cx = 110, cy = 90, r = 70;
-      const x = cx + r * Math.cos(Math.PI - rad);
-      const y = cy - r * Math.sin(Math.PI - rad);
-
-      gcont.innerHTML = `
-        <svg class="gauge-svg" viewBox="0 0 220 115">
-          <path d="M 40 90 A 70 70 0 0 1 180 90" fill="none" stroke="#ede9e2" stroke-width="14" stroke-linecap="round"/>
-          <path d="M 40 90 A 70 70 0 0 1 ${x.toFixed(2)} ${y.toFixed(2)}" fill="none" stroke="${clr}" stroke-width="14" stroke-linecap="round"/>
-          <text x="110" y="80" fill="${clr}" font-family="Lora, Georgia, serif" font-size="34" font-weight="600" text-anchor="middle">${score}</text>
-          <text x="110" y="102" fill="#706b62" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="middle">VULNERABILITY INDEX</text>
-        </svg>
-      `;
-
-      // Risk Pill
-      const pill = document.getElementById('risk-pill');
-      pill.textContent = level === 'low' ? '🛡️ Low Cyber Vulnerability' : level === 'moderate' ? '⚡ Moderate Vulnerability' : '⚠️ Elevated Vulnerability Risk';
-      pill.className = 'risk-pill ' + (level === 'low' ? 'risk-low' : level === 'moderate' ? 'risk-mod' : 'risk-high');
-
-      // Profile description
-      const profiles = {
-        low: "Your visual scenario choices reflect strong cybersecurity disposition and risk vigilance. You consistently select protective measures across device hygiene, workstation control, and privacy boundaries.",
-        moderate: "Your choices reflect an adaptive security posture with balanced awareness. While baseline workstation protective choices are present, certain scenarios indicate potential susceptibility to credential disclosure or social context friction.",
-        high: "Your responses indicate elevated vulnerability disposition. Several choices prioritize convenience or social engagement over defensive workstation safeguards, password complexity, and data privacy."
-      };
-      document.getElementById('profile-text').textContent = profiles[level];
-
-      // Factor Pills
-      document.getElementById('factor-pills').innerHTML = `
-        <div class="factor-pill fp-protect">🛡️ ${protCount} Protective Dispositions</div>
-        <div class="factor-pill fp-risk">⚠️ ${riskCount} Vulnerability Factors</div>
-      `;
-
-      // Breakdown
-      const bd = document.getElementById('q-breakdown');
-      bd.innerHTML = '';
-      QUESTIONS.forEach(q => {
-        const sel = answers[q.id];
-        const opt = q.options[sel];
-        const isRisk = opt.riskType === 'risk';
-        bd.innerHTML += `
-          <div class="q-item">
-            <span class="q-item-tag ${isRisk ? 'tag-risk' : 'tag-protect'}">${isRisk ? '⚠️ Elevated Risk' : '🛡️ Protective'}</span>
-            <div class="q-item-content">
-              <strong>${q.id} (${q.trait})</strong>: Selected Option ${sel} — ${opt.label}
-            </div>
-          </div>
-        `;
-      });
     }
 
     function restart() {
