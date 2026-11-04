@@ -37,3 +37,5 @@ Desktop.ini
 .idea/
 *.swp
 *.swo
+
+*.log
